@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRoutes);
 
-app.use('/api', accessValidation, userRoutes);
+app.use('/api', userRoutes);
 app.use('/api', accessValidation, serviceRoutes);
 
 
