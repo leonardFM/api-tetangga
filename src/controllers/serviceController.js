@@ -2,7 +2,6 @@ const service = require('../models/serviceModel');
 const { convertBigIntToString } = require('../utils/convertBigIntToString ');
 
 
-// Fetch all services for rumah
 const getAllServicesRumah = async (req, res) => {
     try {
         const services = await service.getAllServicesRumah();
@@ -13,7 +12,6 @@ const getAllServicesRumah = async (req, res) => {
         res.status(500).json({ error: 'Unable to fetch services at the moment.' });
     }
 };
-// Fetch all services for kendaraan
 const getAllServicesKendaraan = async (req, res) => {
     try {
         const services = await service.getAllServicesKendaraan();
@@ -37,24 +35,36 @@ const getAllServicesBansos = async (req, res) => {
 };
 
 
-// Fetch service for rumah by id
 const getServiceRumahById = async (req, res) => {
     const { id } = req.params;
     try {
         const serviceDetails = await service.getServiceRumahById(id);
-        res.json(serviceDetails);
+        const servicesWithStringIds = convertBigIntToString(serviceDetails);
+        res.json(servicesWithStringIds);
     } catch (error) {
         console.error(`Error fetching service with id ${id}:`, error);
         res.status(500).json({ error: 'Unable to fetch service details.' });
     }
 };  
 
-// Fetch service for kendaraan by id
 const getServiceKendaraanById = async (req, res) => {
     const { id } = req.params;
     try {
         const serviceDetails = await service.getServiceKendaraanById(id);
-        res.json(serviceDetails);
+        const servicesWithStringIds = convertBigIntToString(serviceDetails);
+        res.json(servicesWithStringIds);
+    } catch (error) {
+        console.error(`Error fetching service with id ${id}:`, error);
+        res.status(500).json({ error: 'Unable to fetch service details.' });
+    }
+};
+
+const getServiceBansosById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const serviceDetails = await service.getServiceKendaraanById(id);
+        const servicesWithStringIds = convertBigIntToString(serviceDetails);
+        res.json(servicesWithStringIds);
     } catch (error) {
         console.error(`Error fetching service with id ${id}:`, error);
         res.status(500).json({ error: 'Unable to fetch service details.' });
@@ -66,5 +76,6 @@ module.exports = {
     getAllServicesKendaraan,
     getServiceRumahById,
     getServiceKendaraanById,
-    getAllServicesBansos
+    getAllServicesBansos,
+    getServiceBansosById
 };

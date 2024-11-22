@@ -2,6 +2,8 @@ const express = require('express');
 const userRoutes = require('./src/routes/userRoutes');
 const serviceRoutes = require('./src/routes/serviceRourtes');
 const authRoutes = require('./src/routes/authRoutes');
+const financeRoutes = require('./src/routes/financeRoutes');
+const umkmRoutes = require('./src/routes/umkmRoutes');
 const accessValidation = require('./src/middlewares/accessValidation');
 const corsConfig = require('./src/middlewares/corsConfig');
 
@@ -16,9 +18,10 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', authRoutes);
-
 app.use('/api', userRoutes);
 app.use('/api', serviceRoutes);
+app.use('/api', financeRoutes);
+app.use('/api', umkmRoutes);
 
 
 app.listen(PORT, '0.0.0.0', () => {

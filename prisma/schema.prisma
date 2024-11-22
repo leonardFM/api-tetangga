@@ -62,6 +62,22 @@ model failed_jobs {
   failed_at  DateTime @default(now()) @db.Timestamp(0)
 }
 
+model iurans {
+  id            BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id       BigInt        @db.UnsignedBigInt
+  bulan         Int
+  tahun         Int
+  jumlah        Decimal       @db.Decimal(15, 2)
+  status        iurans_status @default(Belum_Lunas)
+  tanggal_bayar DateTime?     @db.Date
+  keterangan    String?       @db.Text
+  created_at    DateTime?     @db.Timestamp(0)
+  updated_at    DateTime?     @db.Timestamp(0)
+  users         users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "iurans_user_id_foreign")
+
+  @@index([user_id], map: "iurans_user_id_foreign")
+}
+
 model job_batches {
   id             String  @id @db.VarChar(255)
   name           String  @db.VarChar(255)
@@ -87,6 +103,22 @@ model jobs {
   @@index([queue], map: "jobs_queue_index")
 }
 
+model menus {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(255)
+  umkm_id    BigInt    @db.UnsignedBigInt
+  kategori   String    @db.VarChar(255)
+  harga      Int
+  deskripsi  String    @db.Text
+  foto_menu  String    @db.VarChar(255)
+  status     String    @default("aktif") @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  umkms      umkms     @relation(fields: [umkm_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "menus_umkm_id_foreign")
+
+  @@index([umkm_id], map: "menus_umkm_id_foreign")
+}
+
 model migrations {
   id        Int    @id @default(autoincrement()) @db.UnsignedInt
   migration String @db.VarChar(255)
@@ -97,21 +129,6 @@ model password_reset_tokens {
   email      String    @id @db.VarChar(255)
   token      String    @db.VarChar(255)
   created_at DateTime? @db.Timestamp(0)
-}
-
-model personal_access_tokens {
-  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  tokenable_type String    @db.VarChar(255)
-  tokenable_id   BigInt    @db.UnsignedBigInt
-  name           String    @db.VarChar(255)
-  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
-  abilities      String?   @db.Text
-  last_used_at   DateTime? @db.Timestamp(0)
-  expires_at     DateTime? @db.Timestamp(0)
-  created_at     DateTime? @db.Timestamp(0)
-  updated_at     DateTime? @db.Timestamp(0)
-
-  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
 }
 
 model service_bansos {
@@ -137,6 +154,19 @@ model service_rumahs {
   @@index([user_id], map: "service_rumahs_user_id_foreign")
 }
 
+model service_vehicles {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id         BigInt    @db.UnsignedBigInt
+  nomor_polisi    String    @unique(map: "service_vehicles_nomor_polisi_unique") @db.VarChar(255)
+  jenis_kendaraan String    @db.VarChar(255)
+  warna           String?   @db.VarChar(255)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+  users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "service_vehicles_user_id_foreign")
+
+  @@index([user_id], map: "service_vehicles_user_id_foreign")
+}
+
 model sessions {
   id            String  @id @db.VarChar(255)
   user_id       BigInt? @db.UnsignedBigInt
@@ -147,6 +177,19 @@ model sessions {
 
   @@index([last_activity], map: "sessions_last_activity_index")
   @@index([user_id], map: "sessions_user_id_index")
+}
+
+model umkms {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  nama_umkm  String    @db.VarChar(255)
+  alamat     String    @db.VarChar(255)
+  deskripsi  String    @db.VarChar(255)
+  foto_umkm  String    @db.VarChar(255)
+  status     String    @default("aktif") @db.VarChar(255)
+  kategori   String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  menus      menus[]
 }
 
 model users {
@@ -172,22 +215,60 @@ model users {
   remember_token    String?              @db.VarChar(100)
   created_at        DateTime?            @db.Timestamp(0)
   updated_at        DateTime?            @db.Timestamp(0)
+  iurans            iurans[]
   service_bansos    service_bansos[]
   service_rumahs    service_rumahs[]
   service_vehicles  service_vehicles[]
 }
 
-model service_vehicles {
+model banners {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title       String    @db.VarChar(255)
+  image       String?   @db.VarChar(255)
+  status      String    @default("aktif") @db.VarChar(255)
+  description String    @db.VarChar(255)
+  link        String    @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model financial_records {
   id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id         BigInt    @db.UnsignedBigInt
-  nomor_polisi    String    @unique(map: "service_vehicles_nomor_polisi_unique") @db.VarChar(255)
-  jenis_kendaraan String    @db.VarChar(255)
-  warna           String?   @db.VarChar(255)
+  bulan           String    @db.VarChar(255)
+  tahun           String    @db.VarChar(255)
+  terkumpul       Decimal   @default(0.00) @db.Decimal(15, 2)
+  pengeluaran     Decimal   @default(0.00) @db.Decimal(15, 2)
+  gaji_keamanan   Decimal   @default(0.00) @db.Decimal(15, 2)
+  biaya_sampah    Decimal   @default(0.00) @db.Decimal(15, 2)
+  listrik         Decimal   @default(0.00) @db.Decimal(15, 2)
+  konsumsi        Decimal   @default(0.00) @db.Decimal(15, 2)
+  belanja_alat    Decimal   @default(0.00) @db.Decimal(15, 2)
+  tenaga_kerja    Decimal   @default(0.00) @db.Decimal(15, 2)
+  kasbon_keamanan Decimal   @default(0.00) @db.Decimal(15, 2)
+  dana_sosial     Decimal   @default(0.00) @db.Decimal(15, 2)
+  pengembalian    Decimal   @default(0.00) @db.Decimal(15, 2)
   created_at      DateTime? @db.Timestamp(0)
   updated_at      DateTime? @db.Timestamp(0)
-  users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "service_vehicles_user_id_foreign")
+}
 
-  @@index([user_id], map: "service_vehicles_user_id_foreign")
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String    @db.VarChar(255)
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String    @db.VarChar(255)
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  expires_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+enum iurans_status {
+  Lunas
+  Belum_Lunas @map("Belum Lunas")
 }
 
 enum users_jenis_kelamin {

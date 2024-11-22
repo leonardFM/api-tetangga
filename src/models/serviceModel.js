@@ -6,7 +6,7 @@ const Service = {
         try {
             const services_rumah = await prisma.service_rumahs.findMany({
                 include: {
-                    users: true, // relasi tabel users
+                    users: true, 
                 },
             });
 
@@ -21,10 +21,9 @@ const Service = {
         try {
             const services_rumah = await prisma.service_vehicles.findMany({
                 include: {
-                    users: true, // relasi tabel users
+                    users: true, 
                 },
             });
-
             return services_rumah;
         } catch (error) {
             console.error('Error fetching services:', error);
@@ -36,7 +35,7 @@ const Service = {
         try {
             const services_bansos = await prisma.service_bansos.findMany({
                 include: {
-                    users: true, // relasi tabel users
+                    users: true, 
                 },
             });
 
@@ -50,10 +49,51 @@ const Service = {
 
     getServiceRumahById: async (id) => {
         try {
-            // Pastikan id menggunakan tipe data yang sesuai dengan schema Prisma Anda
             const service = await prisma.service_rumahs.findUnique({
-                where: { id: Number(id) }, // Ubah ke Number jika id adalah integer
+                where: { id: Number(id) }, 
+                include: {
+                    users: true, 
+                },
             });
+
+            if (!service) {
+                throw new Error(`Service with id ${id} not found`);
+            }
+            return service;
+        } catch (error) {                
+            console.error(`Error fetching service with id ${id}:`, error);
+            throw new Error('Unable to fetch service details.');
+        }
+    },
+
+    getServiceKendaraanById: async (id) => {
+        try {
+            const service = await prisma.service_vehicles.findUnique({
+                where: { id: Number(id) }, 
+                include: {
+                    users: true, 
+                },
+            });
+
+            if (!service) {
+                throw new Error(`Service with id ${id} not found`);
+            }
+            return service;
+        } catch (error) {                
+            console.error(`Error fetching service with id ${id}:`, error);
+            throw new Error('Unable to fetch service details.');
+        }
+    },
+
+    getServiceBansosById: async (id) => {
+        try {
+            const service = await prisma.service_bansos.findUnique({
+                where: { id: Number(id) }, 
+                include: {
+                    users: true, 
+                },
+            });
+
             if (!service) {
                 throw new Error(`Service with id ${id} not found`);
             }
