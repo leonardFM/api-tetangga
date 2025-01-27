@@ -3,34 +3,55 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model agendas {
-  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id          BigInt    @id @default(autoincrement())
   title       String    @db.VarChar(255)
   slug        String    @unique(map: "agendas_slug_unique") @db.VarChar(255)
   start_date  DateTime  @db.Date
   location    String    @db.VarChar(255)
-  description String    @db.Text
+  description String
   created_at  DateTime? @db.Timestamp(0)
   updated_at  DateTime? @db.Timestamp(0)
 }
 
 model announcements {
-  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id          BigInt    @id @default(autoincrement())
   title       String    @db.VarChar(255)
   slug        String    @unique(map: "announcements_slug_unique") @db.VarChar(255)
-  description String?   @db.Text
+  description String?
   tanggal     DateTime  @db.Date
   created_at  DateTime? @db.Timestamp(0)
   updated_at  DateTime? @db.Timestamp(0)
 }
 
+model banners {
+  id          BigInt    @id @default(autoincrement())
+  title       String    @db.VarChar(255)
+  image       String?   @db.VarChar(255)
+  status      String    @default("aktif") @db.VarChar(255)
+  description String    @db.VarChar(255)
+  link        String    @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model bansos {
+  id               BigInt    @id @default(autoincrement())
+  nama_bansos      String    @db.VarChar(255)
+  jenis_bansos     String    @db.VarChar(255)
+  informasi_bansos String    @db.VarChar(255)
+  deskripsi        String
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+}
+
 model cache {
   key        String @id @db.VarChar(255)
-  value      String @db.MediumText
+  value      String
   expiration Int
 }
 
@@ -41,10 +62,10 @@ model cache_locks {
 }
 
 model events {
-  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id          BigInt    @id @default(autoincrement())
   title       String    @db.VarChar(255)
   slug        String    @unique(map: "events_slug_unique") @db.VarChar(255)
-  description String?   @db.Text
+  description String?
   image       String    @db.VarChar(255)
   tanggal     DateTime  @db.Date
   lokasi      String    @db.VarChar(255)
@@ -53,29 +74,56 @@ model events {
 }
 
 model failed_jobs {
-  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt   @id @default(autoincrement())
   uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
-  connection String   @db.Text
-  queue      String   @db.Text
-  payload    String   @db.LongText
-  exception  String   @db.LongText
+  connection String
+  queue      String
+  payload    String
+  exception  String
   failed_at  DateTime @default(now()) @db.Timestamp(0)
 }
 
+model finance_totals {
+  id         BigInt    @id @default(autoincrement())
+  bulan      String?   @db.VarChar(255)
+  tahun      String?   @db.VarChar(255)
+  total      Decimal   @default(0) @db.Decimal(15, 2)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model financial_records {
+  id              BigInt    @id @default(autoincrement())
+  bulan           String    @db.VarChar(255)
+  tahun           String    @db.VarChar(255)
+  terkumpul       Decimal   @default(0) @db.Decimal(15, 2)
+  pengeluaran     Decimal   @default(0) @db.Decimal(15, 2)
+  gaji_keamanan   Decimal   @default(0) @db.Decimal(15, 2)
+  biaya_sampah    Decimal   @default(0) @db.Decimal(15, 2)
+  listrik         Decimal   @default(0) @db.Decimal(15, 2)
+  konsumsi        Decimal   @default(0) @db.Decimal(15, 2)
+  belanja_alat    Decimal   @default(0) @db.Decimal(15, 2)
+  tenaga_kerja    Decimal   @default(0) @db.Decimal(15, 2)
+  kasbon_keamanan Decimal   @default(0) @db.Decimal(15, 2)
+  dana_sosial     Decimal   @default(0) @db.Decimal(15, 2)
+  pengembalian    Decimal   @default(0) @db.Decimal(15, 2)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model iurans {
-  id            BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id       BigInt        @db.UnsignedBigInt
+  id            BigInt    @id @default(autoincrement())
+  user_id       BigInt
   bulan         Int
   tahun         Int
-  jumlah        Decimal       @db.Decimal(15, 2)
-  status        iurans_status @default(Belum_Lunas)
-  tanggal_bayar DateTime?     @db.Date
-  keterangan    String?       @db.Text
-  created_at    DateTime?     @db.Timestamp(0)
-  updated_at    DateTime?     @db.Timestamp(0)
-  users         users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "iurans_user_id_foreign")
-
-  @@index([user_id], map: "iurans_user_id_foreign")
+  jumlah        Decimal   @db.Decimal(15, 2)
+  status        String    @default("Belum Lunas") @db.VarChar(255)
+  tanggal_bayar DateTime? @db.Date
+  keterangan    String?
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  users         users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "iurans_user_id_foreign")
 }
 
 model job_batches {
@@ -84,43 +132,41 @@ model job_batches {
   total_jobs     Int
   pending_jobs   Int
   failed_jobs    Int
-  failed_job_ids String  @db.LongText
-  options        String? @db.MediumText
+  failed_job_ids String
+  options        String?
   cancelled_at   Int?
   created_at     Int
   finished_at    Int?
 }
 
 model jobs {
-  id           BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  id           BigInt @id @default(autoincrement())
   queue        String @db.VarChar(255)
-  payload      String @db.LongText
-  attempts     Int    @db.UnsignedTinyInt
-  reserved_at  Int?   @db.UnsignedInt
-  available_at Int    @db.UnsignedInt
-  created_at   Int    @db.UnsignedInt
+  payload      String
+  attempts     Int    @db.SmallInt
+  reserved_at  Int?
+  available_at Int
+  created_at   Int
 
   @@index([queue], map: "jobs_queue_index")
 }
 
 model menus {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
   name       String    @db.VarChar(255)
-  umkm_id    BigInt    @db.UnsignedBigInt
+  umkm_id    BigInt
   kategori   String    @db.VarChar(255)
   harga      Int
-  deskripsi  String    @db.Text
+  deskripsi  String
   foto_menu  String    @db.VarChar(255)
   status     String    @default("aktif") @db.VarChar(255)
   created_at DateTime? @db.Timestamp(0)
   updated_at DateTime? @db.Timestamp(0)
   umkms      umkms     @relation(fields: [umkm_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "menus_umkm_id_foreign")
-
-  @@index([umkm_id], map: "menus_umkm_id_foreign")
 }
 
 model migrations {
-  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  id        Int    @id @default(autoincrement())
   migration String @db.VarChar(255)
   batch     Int
 }
@@ -132,161 +178,49 @@ model password_reset_tokens {
 }
 
 model service_bansos {
-  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id      BigInt    @db.UnsignedBigInt
+  id           BigInt    @id @default(autoincrement())
+  user_id      BigInt
   jenis_bansos String?   @db.VarChar(255)
   status       String    @default("menunggu") @db.VarChar(255)
   created_at   DateTime? @db.Timestamp(0)
   updated_at   DateTime? @db.Timestamp(0)
   users        users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "service_bansos_user_id_foreign")
-
-  @@index([user_id], map: "service_bansos_user_id_foreign")
 }
 
 model service_rumahs {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id    BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  user_id    BigInt
   no_rumah   String    @db.VarChar(255)
   created_at DateTime? @db.Timestamp(0)
   updated_at DateTime? @db.Timestamp(0)
   users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "service_rumahs_user_id_foreign")
-
-  @@index([user_id], map: "service_rumahs_user_id_foreign")
 }
 
 model service_vehicles {
-  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id         BigInt    @db.UnsignedBigInt
+  id              BigInt    @id @default(autoincrement())
+  user_id         BigInt
   nomor_polisi    String    @unique(map: "service_vehicles_nomor_polisi_unique") @db.VarChar(255)
   jenis_kendaraan String    @db.VarChar(255)
   warna           String?   @db.VarChar(255)
   created_at      DateTime? @db.Timestamp(0)
   updated_at      DateTime? @db.Timestamp(0)
   users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "service_vehicles_user_id_foreign")
-
-  @@index([user_id], map: "service_vehicles_user_id_foreign")
 }
 
 model sessions {
   id            String  @id @db.VarChar(255)
-  user_id       BigInt? @db.UnsignedBigInt
+  user_id       BigInt?
   ip_address    String? @db.VarChar(45)
-  user_agent    String? @db.Text
-  payload       String  @db.LongText
+  user_agent    String?
+  payload       String
   last_activity Int
 
   @@index([last_activity], map: "sessions_last_activity_index")
   @@index([user_id], map: "sessions_user_id_index")
 }
 
-model umkms {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  nama_umkm  String    @db.VarChar(255)
-  alamat     String    @db.VarChar(255)
-  deskripsi  String    @db.VarChar(255)
-  foto_umkm  String    @db.VarChar(255)
-  status     String    @default("aktif") @db.VarChar(255)
-  kategori   String    @db.VarChar(255)
-  created_at DateTime? @db.Timestamp(0)
-  updated_at DateTime? @db.Timestamp(0)
-  menus      menus[]
-}
-
-model users {
-  id                BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
-  parent_id         String?              @db.VarChar(255)
-  name              String               @db.VarChar(255)
-  email             String               @unique(map: "users_email_unique") @db.VarChar(255)
-  email_verified_at DateTime?            @db.Timestamp(0)
-  password          String               @db.VarChar(255)
-  status            String               @default("blocked") @db.VarChar(255)
-  rt                Int?
-  rw                Int?
-  alamat            String?              @db.VarChar(255)
-  phone             String?              @db.VarChar(255)
-  role              String               @default("warga") @db.VarChar(255)
-  nik               String?              @unique(map: "users_nik_unique") @db.VarChar(16)
-  tanggal_lahir     DateTime?            @db.Date
-  jenis_kelamin     users_jenis_kelamin?
-  tanggal_masuk     DateTime?            @db.Date
-  aktif             Boolean              @default(true)
-  emergency_contact String?              @db.VarChar(255)
-  foto_profil       String?              @db.VarChar(255)
-  remember_token    String?              @db.VarChar(100)
-  created_at        DateTime?            @db.Timestamp(0)
-  updated_at        DateTime?            @db.Timestamp(0)
-  iurans            iurans[]
-  service_bansos    service_bansos[]
-  service_rumahs    service_rumahs[]
-  service_vehicles  service_vehicles[]
-}
-
-model banners {
-  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  title       String    @db.VarChar(255)
-  image       String?   @db.VarChar(255)
-  status      String    @default("aktif") @db.VarChar(255)
-  description String    @db.VarChar(255)
-  link        String    @db.VarChar(255)
-  created_at  DateTime? @db.Timestamp(0)
-  updated_at  DateTime? @db.Timestamp(0)
-}
-
-model financial_records {
-  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  bulan           String    @db.VarChar(255)
-  tahun           String    @db.VarChar(255)
-  terkumpul       Decimal   @default(0.00) @db.Decimal(15, 2)
-  pengeluaran     Decimal   @default(0.00) @db.Decimal(15, 2)
-  gaji_keamanan   Decimal   @default(0.00) @db.Decimal(15, 2)
-  biaya_sampah    Decimal   @default(0.00) @db.Decimal(15, 2)
-  listrik         Decimal   @default(0.00) @db.Decimal(15, 2)
-  konsumsi        Decimal   @default(0.00) @db.Decimal(15, 2)
-  belanja_alat    Decimal   @default(0.00) @db.Decimal(15, 2)
-  tenaga_kerja    Decimal   @default(0.00) @db.Decimal(15, 2)
-  kasbon_keamanan Decimal   @default(0.00) @db.Decimal(15, 2)
-  dana_sosial     Decimal   @default(0.00) @db.Decimal(15, 2)
-  pengembalian    Decimal   @default(0.00) @db.Decimal(15, 2)
-  created_at      DateTime? @db.Timestamp(0)
-  updated_at      DateTime? @db.Timestamp(0)
-}
-
-model personal_access_tokens {
-  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  tokenable_type String    @db.VarChar(255)
-  tokenable_id   BigInt    @db.UnsignedBigInt
-  name           String    @db.VarChar(255)
-  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
-  abilities      String?   @db.Text
-  last_used_at   DateTime? @db.Timestamp(0)
-  expires_at     DateTime? @db.Timestamp(0)
-  created_at     DateTime? @db.Timestamp(0)
-  updated_at     DateTime? @db.Timestamp(0)
-
-  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
-}
-
-model bansos {
-  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  nama_bansos      String    @db.VarChar(255)
-  jenis_bansos     String    @db.VarChar(255)
-  informasi_bansos String    @db.VarChar(255)
-  deskripsi        String    @db.Text
-  created_at       DateTime? @db.Timestamp(0)
-  updated_at       DateTime? @db.Timestamp(0)
-}
-
-model finance_totals {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  bulan      String?   @db.VarChar(255)
-  tahun      String?   @db.VarChar(255)
-  total      Decimal   @default(0.00) @db.Decimal(15, 2)
-  created_at DateTime? @db.Timestamp(0)
-  updated_at DateTime? @db.Timestamp(0)
-}
-
 model statistik_wargas {
-  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id               BigInt    @id @default(autoincrement())
   jumlah_warga     Int?
   jumlah_laki_laki Int?
   jumlah_perempuan Int?
@@ -298,12 +232,45 @@ model statistik_wargas {
   updated_at       DateTime? @db.Timestamp(0)
 }
 
-enum iurans_status {
-  Lunas
-  Belum_Lunas @map("Belum Lunas")
+model umkms {
+  id         BigInt    @id @default(autoincrement())
+  nama_umkm  String    @db.VarChar(255)
+  alamat     String    @db.VarChar(255)
+  deskripsi  String    @db.VarChar(255)
+  foto_umkm  String    @db.VarChar(255)
+  status     String    @default("aktif") @db.VarChar(255)
+  kategori   String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  menus      menus[]
 }
 
-enum users_jenis_kelamin {
-  laki_laki @map("laki-laki")
-  perempuan
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  id                BigInt             @id @default(autoincrement())
+  parent_id         String?            @db.VarChar(255)
+  name              String             @db.VarChar(255)
+  email             String             @unique(map: "users_email_unique") @db.VarChar(255)
+  email_verified_at DateTime?          @db.Timestamp(0)
+  password          String             @db.VarChar(255)
+  status            String             @default("blocked") @db.VarChar(255)
+  rt                Int?
+  rw                Int?
+  alamat            String?            @db.VarChar(255)
+  phone             String?            @db.VarChar(255)
+  role              String             @default("warga") @db.VarChar(255)
+  nik               String?            @unique(map: "users_nik_unique") @db.VarChar(16)
+  tanggal_lahir     DateTime?          @db.Date
+  jenis_kelamin     String?            @db.VarChar(255)
+  tanggal_masuk     DateTime?          @db.Date
+  aktif             Boolean            @default(true)
+  emergency_contact String?            @db.VarChar(255)
+  foto_profil       String?            @db.VarChar(255)
+  remember_token    String?            @db.VarChar(100)
+  created_at        DateTime?          @db.Timestamp(0)
+  updated_at        DateTime?          @db.Timestamp(0)
+  iurans            iurans[]
+  service_bansos    service_bansos[]
+  service_rumahs    service_rumahs[]
+  service_vehicles  service_vehicles[]
 }
