@@ -60,6 +60,28 @@ const User = {
       throw new Error('Unable to fetch families at the moment.');
     }
   },
+
+
+  getStatistic: async () => {
+    try {
+      const statistic = await prisma.statistik_wargas.findMany();
+      const statistik = {
+        totalUsers: statistic[0].jumlah_warga,
+        totalMale: statistic[0].jumlah_laki_laki,
+        totalFemale: statistic[0].jumlah_perempuan,
+        totalFamily: statistic[0].jumlah_kk,
+        totalChildren: statistic[0].anak,
+        totalBansos: statistic[0].penerima_bansos,
+        totalUmkm: statistic[0].umkm
+      };
+      return statistik;
+    } catch (error) {
+      console.error('Error fetching statistik:', error);
+      throw new Error('Unable to fetch statistik at the moment.');
+    }
+  },
 };
+
+
 
 module.exports = User;

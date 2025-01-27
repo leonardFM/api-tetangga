@@ -266,6 +266,38 @@ model personal_access_tokens {
   @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
 }
 
+model bansos {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  nama_bansos      String    @db.VarChar(255)
+  jenis_bansos     String    @db.VarChar(255)
+  informasi_bansos String    @db.VarChar(255)
+  deskripsi        String    @db.Text
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+}
+
+model finance_totals {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  bulan      String?   @db.VarChar(255)
+  tahun      String?   @db.VarChar(255)
+  total      Decimal   @default(0.00) @db.Decimal(15, 2)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model statistik_wargas {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  jumlah_warga     Int?
+  jumlah_laki_laki Int?
+  jumlah_perempuan Int?
+  jumlah_kk        Int?
+  anak             Int?
+  penerima_bansos  Int?
+  umkm             Int?
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+}
+
 enum iurans_status {
   Lunas
   Belum_Lunas @map("Belum Lunas")

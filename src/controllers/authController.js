@@ -1,5 +1,5 @@
 const express = require('express');
-const { login } = require('./service/auth'); // Import the login function from auth.js
+const { login } = require('./service/auth'); 
 const router = express.Router();
 
 router.post('/login', async (req, res) => {

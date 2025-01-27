@@ -11,6 +11,16 @@ const Umkm = {
             throw new Error('Unable to fetch umkms at the moment.');
         }
     },
+
+    getAllMenu: async () => {
+        try {
+            const menus = await prisma.menus.findMany();
+            return menus;
+        } catch (error) {
+            console.error('Error fetching menus:', error);
+            throw new Error('Unable to fetch menus at the moment.');
+        }
+    },
     getAllUmkmByCategoryMakanan: async () => {
         try {
             const umkms = await prisma.umkms.findMany({

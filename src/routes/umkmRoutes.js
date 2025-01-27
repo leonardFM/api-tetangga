@@ -3,6 +3,7 @@ const umkmController = require('../controllers/umkmController');
 const router = express.Router();
 
 router.get('/umkms', umkmController.getAllUmkm);
+router.get('/menus', umkmController.getAllMenu);
 router.get('/umkm/:id', umkmController.getUmkmById);
 router.get('/umkms/jasa', umkmController.getAllUmkmByCategoryJasa);
 router.get('/umkms/makanan', umkmController.getAllUmkmByCategoryMakanan);
